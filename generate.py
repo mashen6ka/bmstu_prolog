@@ -1,3 +1,11 @@
+def isnumber(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+
 class Var:
     def __init__(self, name):
         self.name = name
@@ -28,15 +36,18 @@ class If:
         self.name = name
         self.value = value
         self.operator_symbol = operator
-        self.operator = self._operator_word(operator)
+        self.operator = self._operator_word(operator, value)
         self.children = children
 
-    def _operator_word(self, operator):
-        if operator == "=": return "EQ"
-        if operator == "!=": return "NEQ"
-        if operator == ">": return "GT"
-        if operator == "<": return "LT"
-        return ""
+    def _operator_word(self, operator, value):
+        word = ""
+        if operator == "=": word = "EQ"
+        if operator == "!=": word = "NEQ"
+        if operator == ">": word = "GT"
+        if operator == "<": word = "LT"
+        if not isnumber(value):
+            word += "V"
+        return word
 
     def __str__(self):
         return f'IF {self.name} {self.operator_symbol} {self.value}'
@@ -81,7 +92,12 @@ def generate(program, offset = 0, code_offset = 0):
             v, s, c = generate(statement.children, i, code_offset + 1)
             
             vertices.append(f'node({i}, [{i+1}, {i+2+len(v)}]).')
-            statements.append(f'statement({i}, "{statement.name}", "{statement.operator}", {statement.value}).')
+
+            value = statement.value
+            if not isnumber(value):
+                value = '"' + value + '"'
+            statements.append(f'statement({i}, "{statement.name}", "{statement.operator}", {value}).')
+            
             code.append(format_code(i, code_offset, statement))
             
             vertices.extend(v)
@@ -103,13 +119,14 @@ def generate(program, offset = 0, code_offset = 0):
 
 program = [
     Input("x"),
-    If("x", ">", "0", [
-        If("x", "<", 0, [
+    Assign("y", 20),
+    Input("n"),
+    If("n", ">", 0, [
+        Assign("x", 10)
+    ]),
 
-        ]),
-        If("x", ">", -1, [
-            
-        ])
+    If("x", ">", "y", [
+        If("x", ">", "y", [])
     ])
 ]
 

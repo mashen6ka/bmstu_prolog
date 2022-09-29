@@ -1,0 +1,11 @@
+(  1)|	INPUT x
+(  2)|	n = 0
+(  3)|	IF x > 1
+(  4)|	    n = 1
+(  5)|	ENDIF
+(  6)|	IF n != 1
+(  7)|	    IF n > 0
+(  8)|	    ENDIF
+(  9)|	ENDIF
+( 10)|	IF n > 0
+( 11)|	ENDIF

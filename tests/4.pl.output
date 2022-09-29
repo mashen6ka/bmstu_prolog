@@ -1,6 +1,6 @@
-Vertex 1: OK
-Vertex 2: OK
-Vertex 3: [ALWAYS TRUE] OK
-Vertex 4: UNREACHABLE
-Vertex 7: OK
+Statement 1: OK
+Statement 2: OK
+Statement 3: [ALWAYS TRUE] OK
+Statement 4: UNREACHABLE
+Statement 7: OK
 EOF

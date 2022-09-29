@@ -1,3 +1,22 @@
+% example: some([1,2,3], =(3)).
+some(List, Predicate) :- once(some_(List, Predicate)).
+some_([H|_], Predicate) :- call(Predicate, H).
+some_([_|T], Predicate) :- some_(T, Predicate).
+
+% example: somev([1,2,3], =, 3).
+somev(List, Predicate, X) :- once(somev_(List, Predicate, X)).
+somev_([H|_], Predicate, X) :- call(Predicate, H, X).
+somev_([_|T], Predicate, X) :- somev_(T, Predicate, X).
+
+% example: somel([1,2,3], =, [3]).
+somel(LeftList, Predicate, RightList) :- some(RightList, somev(LeftList, Predicate)).
+
+% example: remove([1,2,3], [1], R).
+remove(L, [], L) :- !.
+remove([X|Tail], [X|Rest], Result) :- !, remove(Tail, Rest, Result).
+remove([X|Tail], L, [X|Result]):- remove(Tail, L, Result).
+
+
 :- dynamic level/1.
 level(1).
 push_level :-
@@ -11,6 +30,7 @@ pop_level :-
     retract(level(Current)),
     asserta(level(Prev)).
 
+
 % traverse(Level, node(Vertex, Adjacency))
 traverse(Vertex) :-
     node(Vertex, List),
@@ -18,12 +38,12 @@ traverse(Vertex) :-
 
 traverse(node(_Vertex, [])) :- write("EOF"), !.
 traverse(node(Vertex, [H])) :-
-    write("Vertex "), write(Vertex), writeln(": OK"),
+    write("Statement "), write(Vertex), writeln(": OK"),
     router(Vertex),
     node(H, List),
     traverse(node(H, List)).
 traverse(node(Vertex, [T, F])) :-
-    write("Vertex "), write(Vertex), write(": "),
+    write("Statement "), write(Vertex), write(": "),
     (router(Vertex)
     	->	writeln("OK"),
         	node(T, TList), traverse(node(T, TList))
@@ -46,6 +66,10 @@ always_true_off(Level) :- (retract(always_true(Level)) ; true).
 
 copy_vars_to_next_level_except(Level, NewLevel, Except) :-
     forall((var(Level, Name, Left, Right, Possible, Impossible), Name \= Except),
+           create_var(NewLevel, Name, Left, Right, Possible, Impossible)).
+
+copy_vars_to_next_level_except2(Level, NewLevel, Except1, Except2) :-
+    forall((var(Level, Name, Left, Right, Possible, Impossible), Name \= Except1, Name \= Except2),
            create_var(NewLevel, Name, Left, Right, Possible, Impossible)).
 
 copy_vars_to_prev_level(Level, PrevLevel) :-
@@ -102,13 +126,13 @@ router(Vertex) :-
     	 member(Value, Impossible))
     	->  push_level, level(NextLevel),
     		always_true_on(NextLevel), write("[ALWAYS TRUE] ")
-    	;   (Left \= Right, Left =< Value, Value =< Right),
+    	;   ((Left \= Right, Left =< Value, Value =< Right) ; member(Value, Possible)),
     		push_level, level(NextLevel)
     ),
     copy_vars_to_next_level_except(Level, NextLevel, Name),
     append(Impossible, [Value], UpdatedImpossible),
     create_var(NextLevel, Name, Left, Right, Possible, UpdatedImpossible).
-               
+
 router(Vertex) :-
     statement(Vertex, Name, Operation, Value),
     Operation = "GT",
@@ -116,12 +140,36 @@ router(Vertex) :-
     (Left > Value
     	->	push_level, level(NextLevel),
     		always_true_on(NextLevel), write("[ALWAYS TRUE] ")
-    	;	Right > Value,
+    	;	(Right > Value ; remove(Possible, Impossible, FilteredPossible), somev(FilteredPossible, >, Value)),
     		push_level, level(NextLevel)
     ),
     copy_vars_to_next_level_except(Level, NextLevel, Name),
     (Left = Right -> NewLeft is Left ; NewLeft is Value + 1),
     create_var(NextLevel, Name, NewLeft, Right, Possible, Impossible).
+
+router(Vertex) :-
+    statement(Vertex, LName, Operation, RName),
+    Operation = "GTV",
+    level(Level), 
+    var(Level, LName, LLeft, LRight, LPossible, LImpossible),
+    write(var(Level, LName, LLeft, LRight, LPossible, LImpossible)),
+    var(Level, RName, RLeft, RRight, RPossible, RImpossible),
+    write(var(Level, RName, RLeft, RRight, RPossible, RImpossible)),
+    remove(LPossible, LImpossible, LFilteredPossible),
+    remove(RPossible, RImpossible, RFilteredPossible),
+    (LLeft > RRight
+        ->  push_level, level(NextLevel),
+            always_true_on(NextLevel), write("[ALWAYS TRUE] ")
+        ;   (LRight >= RLeft ; somev(LFilteredPossible, >, RFilteredPossible)),
+            push_level, level(NextLevel)
+    ),
+    copy_vars_to_next_level_except2(Level, NextLevel, LName, RName),
+    (RLeft \= -inf -> LNewLeft  is max(LLeft, RLeft + 1)   ; LNewLeft  is LLeft),
+    (LRight \= inf -> RNewRight is min(LRight - 1, RRight) ; RNewRight is RRight),
+    include(<(LNewLeft), LPossible, LNewPossible),
+    include(>(RNewRight), RPossible, RNewPossible),
+    create_var(NextLevel, LName, LNewLeft, LRight, LNewPossible, LImpossible),
+    create_var(NextLevel, RName, RLeft, RNewRight, RNewPossible, RImpossible).
 
 router(Vertex) :-
     statement(Vertex, Name, Operation, Value),
@@ -130,7 +178,7 @@ router(Vertex) :-
     (Right < Value
     	->	push_level, level(NextLevel),
     		always_true_on(NextLevel), write("[ALWAYS TRUE] ")
-    	;	Left < Value,
+    	;	(Left < Value ; remove(Possible, Impossible, FilteredPossible), somev(FilteredPossible, <, Value)),
     		push_level, level(NextLevel)
     ),
     copy_vars_to_next_level_except(Level, NextLevel, Name),
