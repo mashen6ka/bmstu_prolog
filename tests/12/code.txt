@@ -1,0 +1,14 @@
+(  1)|	INPUT x
+(  2)|	INPUT y
+(  3)|	IF x > 2
+(  4)|	    IF x < 6
+(  5)|	        IF y > 3
+(  6)|	            IF y < 10
+(  7)|	                IF x = y
+(  8)|	                    IF x != y
+(  9)|	                    ENDIF
+( 10)|	                ENDIF
+( 11)|	            ENDIF
+( 12)|	        ENDIF
+( 13)|	    ENDIF
+( 14)|	ENDIF

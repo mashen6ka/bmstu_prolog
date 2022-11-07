@@ -256,6 +256,7 @@ router(Vertex) :-
     var(Level, RName, RLeft, RRight, RPossible, RImpossible),
     remove(LPossible, LImpossible, LFilteredPossible),
     remove(RPossible, RImpossible, RFilteredPossible),
+    LName \= RName,
     (LLeft > RRight
         ->  push_level, level(NextLevel),
             always_true_on(NextLevel), write("[ALWAYS TRUE] ")
@@ -285,8 +286,8 @@ router(Vertex) :-
             push_level, level(NextLevel)
     ),
     copy_vars_to_next_level_except2(Level, NextLevel, LName, RName),
-    (RLeft \= inf -> LNewLeft  is max(LLeft, RLeft)   ; LNewLeft  is LLeft),
-    (LRight \= -inf -> RNewRight is min(LRight, RRight) ; RNewRight is RRight),
+    (RLeft \= -inf, LLeft \= -inf -> LNewLeft  is max(LLeft, RLeft)   ; LNewLeft  is LLeft),
+    (LRight \= inf, RRight \= inf -> RNewRight is min(LRight, RRight) ; RNewRight is RRight),
     include(=<(LNewLeft), LPossible, LNewPossible),
     include(>=(RNewRight), RPossible, RNewPossible),
     create_var(NextLevel, LName, LNewLeft, LRight, LNewPossible, LImpossible),
@@ -328,6 +329,7 @@ router(Vertex) :-
     var(Level, RName, RLeft, RRight, RPossible, RImpossible),
     remove(LPossible, LImpossible, LFilteredPossible),
     remove(RPossible, RImpossible, RFilteredPossible),
+    LName \= RName,
     (LRight < RLeft
         ->  push_level, level(NextLevel),
             always_true_on(NextLevel), write("[ALWAYS TRUE] ")
@@ -353,12 +355,12 @@ router(Vertex) :-
     (LRight =< LLeft
         ->  push_level, level(NextLevel),
             always_true_on(NextLevel), write("[ALWAYS TRUE] ")
-        ;   (LLeft >= RRight ; somev(LFilteredPossible, =<, RFilteredPossible)),
+        ;   (LLeft =< RRight ; somev(LFilteredPossible, =<, RFilteredPossible)),
             push_level, level(NextLevel)
     ),
     copy_vars_to_next_level_except2(Level, NextLevel, LName, RName),
-    (RRight \= inf -> LNewRight is min(LRight, RRight)   ; LNewRight  is LRight),
-    (LLeft \= -inf -> RNewLeft is max(RLeft, LLeft) ; RNewLeft is RLeft),
+    (RRight \= inf, LRight \= inf -> LNewRight is min(LRight, RRight)   ; LNewRight  is LRight),
+    (LLeft \= -inf, RLeft \= -inf -> RNewLeft is max(RLeft, LLeft) ; RNewLeft is RLeft),
     include(>=(LNewRight), LPossible, LNewPossible),
     include(=<(RNewLeft), RPossible, RNewPossible),
     create_var(NextLevel, LName, LLeft, LNewRight, LNewPossible, LImpossible),

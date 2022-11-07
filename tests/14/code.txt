@@ -1,0 +1,4 @@
+(  1)|	INPUT x
+(  2)|	INPUT y
+(  3)|	IF x != x
+(  4)|	ENDIF

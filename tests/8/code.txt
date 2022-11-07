@@ -1,0 +1,10 @@
+(  1)|	x = 0
+(  2)|	y = 0
+(  3)|	IF x >= y
+(  4)|	ENDIF
+(  5)|	IF x <= y
+(  6)|	ENDIF
+(  7)|	IF y >= x
+(  8)|	ENDIF
+(  9)|	IF y <= x
+( 10)|	ENDIF

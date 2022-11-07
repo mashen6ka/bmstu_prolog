@@ -1,0 +1,5 @@
+(  1)|	INPUT x
+(  2)|	IF x > x
+(  3)|	ENDIF
+(  4)|	IF x < x
+(  5)|	ENDIF

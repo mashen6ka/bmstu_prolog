@@ -45,6 +45,8 @@ class If:
         if operator == "!=": word = "NEQ"
         if operator == ">": word = "GT"
         if operator == "<": word = "LT"
+        if operator == ">=": word = "GEQ"
+        if operator == "<=": word = "LEQ"
         if not isnumber(value):
             word += "V"
         return word
@@ -118,15 +120,9 @@ def generate(program, offset = 0, code_offset = 0):
 
 
 program = [
-    Input("x"),
-    Assign("y", 20),
-    Input("n"),
-    If("n", ">", 0, [
-        Assign("x", 10)
-    ]),
-
-    If("x", ">", "y", [
-        If("x", ">", "y", [])
+    Assign("x", 0),
+    If("x", "=", 0, [
+        If("x", "=", -1, [])
     ])
 ]
 

@@ -1,15 +1,17 @@
+#!/usr/bin/env python3
+
 import glob
 import subprocess
 
-inputs = glob.glob('./tests/*.pl')
+inputs = glob.glob('./tests/*')
 
-for input_path in inputs:
-    path = input_path[2:len(input_path)-3]
-    command = ['swipl', '-g', f'consult(main), consult({path}), traverse(1)', '-g', 'halt']
+for base_path in inputs:
+    input_path = base_path[2:] + '/input'
+    command = ['swipl', '-g', f'consult(main), consult({input_path}), traverse(1)', '-g', 'halt']
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     
-    with open(input_path + '.output') as expected:
+    with open(base_path + '/output.txt') as expected:
         expected_data = expected.read()
         if stdout.decode('ascii') != expected_data:
             print('===', input_path, 'FAIL')

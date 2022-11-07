@@ -1,0 +1,16 @@
+(  1)|  INPUT x
+(  2)|  INPUT y
+(  3)|  n = 1
+(  4)|  IF x > 2
+(  5)|      IF x < 10
+(  6)|          IF y > 5
+(  7)|              IF y < 16
+(  8)|                  IF x > y
+(  9)|                      n = 3
+( 10)|                  ENDIF
+( 11)|              ENDIF
+( 12)|          ENDIF
+( 13)|      ENDIF
+( 14)|  ENDIF
+( 15)|  IF n = 3
+( 16)|  ENDIF

@@ -1,0 +1,13 @@
+(  1)|	x = 0
+(  2)|	IF x >= x
+(  3)|	ENDIF
+(  4)|	IF x <= x
+(  5)|	ENDIF
+(  6)|	IF x = x
+(  7)|	ENDIF
+(  8)|	IF x != x
+(  9)|	ENDIF
+( 10)|	IF x > x
+( 11)|	ENDIF
+( 12)|	IF x < x
+( 13)|	ENDIF

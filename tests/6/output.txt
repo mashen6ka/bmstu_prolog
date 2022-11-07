@@ -1,0 +1,5 @@
+Statement 1: OK
+Statement 2: OK
+Statement 3: [ALWAYS TRUE] OK
+Statement 4: OK
+EOF
